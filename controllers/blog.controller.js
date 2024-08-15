@@ -56,7 +56,22 @@ const updateBlog = async (req,res,next) => {
     catch(error){
         res.status(500).json({ message: error.message })
     }
+}
 
+
+
+const getBlogById = async (req,res,next) => {
+    const blogId = req.params.id;
+    try{
+        const blog = await Blogs.findById(blogId);
+        if(!blog){
+            return res.status(404).json({message: "Blog not found"})
+        }
+        return res.status(200).json({blog})
+    }
+    catch(error){
+        res.status(500).json({ message: error.message })
+    }
 }
 
 
@@ -64,5 +79,6 @@ const updateBlog = async (req,res,next) => {
 module.exports = {
     getAllBlogs,
     addBlog,
-    updateBlog
+    updateBlog,
+    getBlogById
 }
