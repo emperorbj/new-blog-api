@@ -38,7 +38,31 @@ const addBlog = async (req,res,next) => {
 
 
 
+
+const updateBlog = async (req,res,next) => {
+    const {title, content} = req.body;
+    const blogId = req.params.id;
+    try{
+        const blog = await Blogs.findByIdAndUpdate(blogId,{
+            title,
+            content
+        })
+
+        if(!blog){
+            return res.status(404).json({message: "Blog not found"})
+        }
+        return res.status(200).json({blog})
+    }
+    catch(error){
+        res.status(500).json({ message: error.message })
+    }
+
+}
+
+
+
 module.exports = {
     getAllBlogs,
-    addBlog
+    addBlog,
+    updateBlog
 }
