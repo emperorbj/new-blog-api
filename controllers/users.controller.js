@@ -37,7 +37,8 @@ const signUp = async (req, res, next) => {
         const user = new User({
             name,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            blogs: []
         });
         await user.save();
         return res.status(201).json({ user })

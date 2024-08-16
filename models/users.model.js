@@ -14,7 +14,11 @@ const UserSchema = new Schema({
     password: {
         type: String,
         required: [true, 'please enter your password']
-    }
+    },
+    blogs: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Blog'
+    }]
 }, {
     timestamps: true
 })

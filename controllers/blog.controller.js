@@ -1,4 +1,6 @@
 const Blogs = require('../models/blog.model');
+const User = require('../models/users.model');
+const mongoose = require('mongoose');
 
 
 
@@ -20,20 +22,39 @@ const getAllBlogs = async (req,res,next) => {
 
 const addBlog = async (req,res,next) => {
     const {title, content, author, image, date} = req.body;
-    const blog = new Blogs({
-        title,
-        content,
-        author,
-        image,
-        date
-    })
+
     try{
-        await blog.save();
+        const existingUser = await User.findById(author);
+        if(!existingUser){
+            return res.status(404).json({message: "User not found"})
+        }
+        const blog = new Blogs({
+            title,
+            content,
+            author,
+            image,
+            date
+        }) 
+
+        const session = await mongoose.startSession();
+        session.startTransaction();
+        await blog.save({session});
+        existingUser.blogs.push(blog);
+        await existingUser.save({session})
+        await session.commitTransaction();
+        return res.status(200).json({blog})
     }
     catch(error){
         res.status(500).json({ message: error.message })
     }
-    return res.status(200).json({blog})
+
+    // try{
+        
+    // }
+    // catch(error){
+    //     res.status(500).json({ message: error.message })
+    // }
+    // return res.status(200).json({blog})
 }
 
 
@@ -79,11 +100,28 @@ const getBlogById = async (req,res,next) => {
 const deleteBlogById = async (req,res,next) => {
     const blogId = req.params.id;
     try{
-        const blog = await Blogs.findByIdAndDelete(blogId);
+        const blog = await Blogs.findByIdAndDelete(blogId).populate('author');
+        await blog.author.blogs.pull(blog);
+        await blog.author.save(); 
         if(!blog){
             return res.status(404).json({message: "Blog not found"})
         }
         return res.status(200).json({message: "successfully deleted blog"})
+    }
+    catch(error){
+        res.status(500).json({ message: error.message })
+    }
+}
+
+const getBlogByUserId = async (req,res,next) => {
+    const userId = req.params.id;
+    try{
+        const userBlogs = await User.findById(userId).populate('blogs');
+        if(!userBlogs){
+            return res.status(404).json({message: "Blog by user not found"})
+        }
+        return res.status(200).json({blogs: userBlogs})
+
     }
     catch(error){
         res.status(500).json({ message: error.message })
@@ -96,5 +134,6 @@ module.exports = {
     addBlog,
     updateBlog,
     getBlogById,
-    deleteBlogById
+    deleteBlogById,
+    getBlogByUserId
 }
