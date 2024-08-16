@@ -76,9 +76,25 @@ const getBlogById = async (req,res,next) => {
 
 
 
+const deleteBlogById = async (req,res,next) => {
+    const blogId = req.params.id;
+    try{
+        const blog = await Blogs.findByIdAndDelete(blogId);
+        if(!blog){
+            return res.status(404).json({message: "Blog not found"})
+        }
+        return res.status(200).json({message: "successfully deleted blog"})
+    }
+    catch(error){
+        res.status(500).json({ message: error.message })
+    }
+}
+
+
 module.exports = {
     getAllBlogs,
     addBlog,
     updateBlog,
-    getBlogById
+    getBlogById,
+    deleteBlogById
 }
