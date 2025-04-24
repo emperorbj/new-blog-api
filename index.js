@@ -1,5 +1,5 @@
 import express from 'express';
-const app = express();
+
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './config/connectDB.js';
@@ -11,7 +11,7 @@ import jobs from  './lib/cron.js'
 
 dotenv.config();
 const port = 3000
-
+const app = express();
 // const router = require('./routes/user.route');
 // const blogRouter = require('./routes/blog.route');
 
