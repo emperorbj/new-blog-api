@@ -6,6 +6,7 @@ import { connectDB } from './config/connectDB.js';
 import authRouter from './routes/user.route.js'
 import blogRouter from './routes/blog.route.js';
 import videoRouter from './routes/video.route.js'
+import jobs from  './lib/cron.js'
 
 
 dotenv.config();
@@ -13,6 +14,8 @@ const port = 3000
 
 // const router = require('./routes/user.route');
 // const blogRouter = require('./routes/blog.route');
+
+jobs.start()
 
 
 // middlewares
