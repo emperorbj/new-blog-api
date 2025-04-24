@@ -1,27 +1,23 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from "mongoose";
 
-const UserSchema = new Schema({
-    name: {
-        type: String,
-        required: [true, 'please enter your name']
-    },
-    email: {
-        type: String,
-        required: [true, 'please enter your email'],
-        unique: true
-    },
-    password: {
-        type: String,
-        required: [true, 'please enter your password']
-    },
-    blogs: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Blog'
-    }]
-}, {
-    timestamps: true
-})
+const UserSchema = new mongoose.Schema({
+	name:{
+  type:String,
+  required:[true,"please enter your name"]
+  },
+  email:{
+  type:String,
+  required:[true,"please enter your email"],
+  unique:true
+  },
+  password:{
+	type:String,
+  required:[true,"please enter your password"]
+  },
+  profileImage:{
+  type:String,
+  default:"https://api.dicebear.com/7.x/avataaars/svg?seed=hello"
+  }
+},{timestamps:true})
 
-const User = mongoose.model("User", UserSchema);
-module.exports = User
+export const User = mongoose.model("User",UserSchema)

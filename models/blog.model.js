@@ -1,32 +1,29 @@
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+import mongoose from "mongoose";
 
-const blogSchema = new Schema({
-    title:{
-        type:String,
-        required:true
-    },
-    content:{
-        type:String,
-        required:true
-    },
-    author:{
-        type:mongoose.Types.ObjectId,
-        ref:'User',
-        required:true
-    },
-    image:{
-        type:String,
-        required:false
-    },
-    date:{
-        type:Date,
-        default:Date.now,
-        required: false
-    }
-},{
-    timestamps: true
+const blogSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true
+      },
+      summary: String,
+      content: {
+        type: String,
+        required: true
+      },
+      image: String, // Thumbnail or banner image
+      category: {
+        type: String,
+        enum:{
+          values:['philosophical','historical','cultural','scientific'],
+          message:'{VALUE} is not supported'
+        },
+        required: true
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+}
+
 })
 
-const Blogs = mongoose.model("Blog", blogSchema);
-module.exports = Blogs;
+export const Blog = mongoose.model("Blog", blogSchema);

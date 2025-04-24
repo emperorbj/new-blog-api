@@ -1,11 +1,18 @@
-const express = require('express');
-const mongoose  = require('mongoose');
+import express from 'express';
 const app = express();
-const cors = require('cors')
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './config/connectDB.js';
+import authRouter from './routes/user.route.js'
+import blogRouter from './routes/blog.route.js';
+import videoRouter from './routes/video.route.js'
+
+
+dotenv.config();
 const port = 3000
 
-const router = require('./routes/user.route');
-const blogRouter = require('./routes/blog.route');
+// const router = require('./routes/user.route');
+// const blogRouter = require('./routes/blog.route');
 
 
 // middlewares
@@ -13,18 +20,18 @@ app.use(cors());
 app.use(express.json());
 
 // routes
-app.use('/api/users',router);
+app.use('/api/auth',authRouter);
 app.use('/api/blogs',blogRouter);
+app.use('/api/videos',videoRouter)
 
 // CONNECTION WITH MONGODB
-mongoose.connect("mongodb+srv://cwaku96:zCD5q6k4V3rwOo5t@socialapi.eimsp.mongodb.net/Social-API?retryWrites=true&w=majority&appName=socialAPI")
-.then(() => {
-    console.log('Connected!')
-    app.listen(port, () => {
-        console.log(`server running on port ${port}`);
-        
-    })
 
+app.listen(port, () => {
+    
+    connectDB();
+    console.log(`server running on port ${port}`);
+    
+    
 })
-.catch(() => console.log('connection failed')
-)
+
+

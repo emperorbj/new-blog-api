@@ -1,13 +1,13 @@
-const express = require('express');
-const { getAllBlogs, addBlog, updateBlog, getBlogById, deleteBlogById, getBlogByUserId } = require('../controllers/blog.controller');
+import express from 'express';
+import { addBlog, deleteBlog, getAllBlogs, updateBlog } from '../controllers/blog.controller.js';
+
 const blogRouter = express.Router();
 
 blogRouter.get('/',getAllBlogs);
-blogRouter.post('/add',addBlog);
-blogRouter.put('/update/:id',updateBlog);
-blogRouter.get('/:id',getBlogById);
-blogRouter.delete('/:id',deleteBlogById);
-blogRouter.get('/user/:id',getBlogByUserId)
+blogRouter.post('/',addBlog);
+blogRouter.put('/:id',updateBlog);
+blogRouter.delete('/:id',deleteBlog);
 
 
-module.exports = blogRouter;
+
+export default blogRouter;

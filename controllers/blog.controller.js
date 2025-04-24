@@ -1,139 +1,106 @@
-const Blogs = require('../models/blog.model');
-const User = require('../models/users.model');
-const mongoose = require('mongoose');
+
+import { Blog } from "../models/blog.model.js";
 
 
-
-const getAllBlogs = async (req,res,next) => {
-    try{
-        const blogs = await Blogs.find({});
-        if(!blogs){
-            return res.status(404).json({message: "No blogs found"})
+export const addBlog = async (request,response)=>{
+    const {title,summary,content,image,category} = request.body
+    try {
+        if(!title || !summary || !content || !image || !category){
+            return response.status(409).json({message:"All fields are required"})
         }
-        res.status(200).json({blogs})
-    }
-    catch(error){
-        res.status(500).json({ message: error.message })
-    }
 
-}
-
-
-
-const addBlog = async (req,res,next) => {
-    const {title, content, author, image, date} = req.body;
-
-    try{
-        const existingUser = await User.findById(author);
-        if(!existingUser){
-            return res.status(404).json({message: "User not found"})
-        }
-        const blog = new Blogs({
+        const blog = new Blog({
             title,
+            summary,
             content,
-            author,
             image,
-            date
-        }) 
-
-        const session = await mongoose.startSession();
-        session.startTransaction();
-        await blog.save({session});
-        existingUser.blogs.push(blog);
-        await existingUser.save({session})
-        await session.commitTransaction();
-        return res.status(200).json({blog})
-    }
-    catch(error){
-        res.status(500).json({ message: error.message })
-    }
-
-    // try{
-        
-    // }
-    // catch(error){
-    //     res.status(500).json({ message: error.message })
-    // }
-    // return res.status(200).json({blog})
-}
-
-
-
-
-const updateBlog = async (req,res,next) => {
-    const {title, content} = req.body;
-    const blogId = req.params.id;
-    try{
-        const blog = await Blogs.findByIdAndUpdate(blogId,{
-            title,
-            content
+            category
         })
 
-        if(!blog){
-            return res.status(404).json({message: "Blog not found"})
-        }
-        return res.status(200).json({blog})
-    }
-    catch(error){
-        res.status(500).json({ message: error.message })
+        await blog.save()
+        return response.status(201).json({success:true ,blog:blog})
+    } catch (error) {
+        return response.status(500).json({message:"something went wrong",error:error.message})
     }
 }
 
 
-
-const getBlogById = async (req,res,next) => {
-    const blogId = req.params.id;
+export const getAllBlogs = async (request,response)=>{
+    const {search,title,category, page=1,limit=5} = request.query
     try{
-        const blog = await Blogs.findById(blogId);
-        if(!blog){
-            return res.status(404).json({message: "Blog not found"})
+        const queryObject = {}
+        if(search){
+            queryObject.$or = [
+                {title:{ $regex:search , $options:'i' }},
+                {category: {$regex: search, $options:'i'}}
+            ]
         }
-        return res.status(200).json({blog})
-    }
-    catch(error){
-        res.status(500).json({ message: error.message })
+
+        if(title){
+            queryObject.title = {$regex: title,$options:'i'}
+        }
+
+        if(category){
+            queryObject.title = {$regex: category,$options:'i'}
+        }
+
+        const skip = (parseInt(page)-1)*parseInt(limit)
+
+        const blogs = await Blog.find(queryObject)
+        .skip(skip)
+        .limit(parseInt(limit))
+        .sort({createdAt: -1})
+
+        if(blogs.length === 0 ) {
+            return response.status(404).json({message:"No book was found"})
+        }
+
+        
+        const totalBlogs = await Blog.countDocuments(queryObject)
+        const totalPages = Math.ceil(totalBlogs/parseInt(limit))
+
+        return response.status(200).json({
+            success:true,
+            totalPages,
+            currentPage:parseInt(page),
+            blogs
+        })
+    }catch(error){
+        return response.status(500).json({message:"something went wrong",error:error.message})
     }
 }
 
 
 
-const deleteBlogById = async (req,res,next) => {
-    const blogId = req.params.id;
+export const updateBlog = async (request,response)=> {
+    const id = request.params.id
     try{
-        const blog = await Blogs.findByIdAndDelete(blogId).populate('author');
-        await blog.author.blogs.pull(blog);
-        await blog.author.save(); 
+        const blog = await Blog.findByIdAndUpdate(id,{$set:request.body},{new:true})
+
         if(!blog){
-            return res.status(404).json({message: "Blog not found"})
+            return response.status(404).json({message:"blog not found"})
         }
-        return res.status(200).json({message: "successfully deleted blog"})
-    }
-    catch(error){
-        res.status(500).json({ message: error.message })
+
+        return response.status(200).json({
+            success:true,
+            blog:blog
+        })
+    }catch(error){
+        return response.status(500).json({message:"something went wrong",error:error.message})
     }
 }
 
-const getBlogByUserId = async (req,res,next) => {
-    const userId = req.params.id;
+export const deleteBlog = async (request,response)=>{
+    const id = request.params.id
     try{
-        const userBlogs = await User.findById(userId).populate('blogs');
-        if(!userBlogs){
-            return res.status(404).json({message: "Blog by user not found"})
+        const blog = await Blog.findByIdAndDelete(id)
+
+        if(!blog){
+            return response.status(404).json({message:"blog not found to be deleted"})
         }
-        return res.status(200).json({blogs: userBlogs})
 
+        return response.status(200).json({message:"blog deleted successfully"})
+    }catch(error){
+        return response.status(500).json({message:"something went wrong",error:error.message})
     }
-    catch(error){
-        res.status(500).json({ message: error.message })
-    }
-}
-
-
-module.exports = {
-    getAllBlogs,
-    addBlog,
-    updateBlog,
-    getBlogById,
-    deleteBlogById,
-    getBlogByUserId
 }
