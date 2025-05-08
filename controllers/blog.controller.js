@@ -104,3 +104,18 @@ export const deleteBlog = async (request,response)=>{
         return response.status(500).json({message:"something went wrong",error:error.message})
     }
 }
+
+export const getSingleBlog = async (request,response)=>{
+    const id = request.params.id
+    try{
+        const blog = await Blog.findById(id)
+
+        if(!blog){
+            return response.status(404).json({message:"blog not found"})
+        }
+
+        return response.status(200).json({message:"success",blog:blog})
+    }catch(error){
+        return response.status(500).json({message:"something went wrong",error:error.message})
+    }
+}
