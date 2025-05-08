@@ -41,7 +41,7 @@ export const getAllBlogs = async (request,response)=>{
         }
 
         if(category){
-            queryObject.title = {$regex: category,$options:'i'}
+            queryObject.category = {$regex: category,$options:'i'}
         }
 
         const skip = (parseInt(page)-1)*parseInt(limit)
