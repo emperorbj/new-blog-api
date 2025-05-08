@@ -14,7 +14,7 @@ const blogSchema = new mongoose.Schema({
       category: {
         type: String,
         enum:{
-          values:['philosophical','historical','cultural','scientific'],
+          values:['philosophical','historical','textual','scientific'],
           message:'{VALUE} is not supported'
         },
         required: true
