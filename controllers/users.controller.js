@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 
 
 export const signup = async (request,response)=> {
-    const {name,email,password} = request.body;
+    const {name,email,phone,password} = request.body;
     try{
-        if(!name || !email || !password ) {
+        if(!name || !email || !phone || !password ) {
             return response.status(401).json({message:'All fields are required'})
         }
 
@@ -25,6 +25,7 @@ export const signup = async (request,response)=> {
         const user = new User({
             name,
             email,
+            phone,
             password:hashedPassword,
             profileImage
         })
@@ -37,6 +38,7 @@ export const signup = async (request,response)=> {
             id:user._id,
             name:user.name,
             email:user.email,
+            phone:user.phone,
             imageURL:user.profileImage,
             createdAt:user.createdAt
         }})
@@ -78,6 +80,7 @@ export const login = async (request,response)=> {
             id:user._id,
             name:user.name,
             email:user.email,
+            phone:user.phone,
             imageURL:user.profileImage,
             createdAt:user.createdAt
             }
