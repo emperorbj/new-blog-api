@@ -31,7 +31,10 @@ export const getAllVideos = async (request,response)=>{
             queryObject.latest = {$regex:latest,$options:'i'}
         }
         if(search){
-            queryObject.title = {$regex:search,$options:'i'}
+            queryObject.$or = [
+                {title:{ $regex:search , $options:'i' }},
+                {category: {$regex: search, $options:'i'}}
+            ]
         }
         
         const skip = (parseInt(page)-1)*parseInt(limit)
