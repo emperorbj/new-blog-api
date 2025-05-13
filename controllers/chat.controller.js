@@ -8,7 +8,7 @@ export const sendChat = async (request,response) => {
     
     try {
         const {userId,question} = request.body;
-        if(!userId | !question | typeof question !== 'string') {
+        if(!userId || !question || typeof question !== 'string') {
             return response.status(400).json({error:"invalid input"})
         }
 
@@ -29,15 +29,15 @@ export const sendChat = async (request,response) => {
 
         await chatResponse.save()
 
-        return response.status(200).json({response})
+        return response.status(200).json({answer:newresponse})
 
 
     } catch (error) {
         console.error('Error:', error);
     if (error.message.includes('Quota exceeded')) {
-      return res.status(429).json({ error: 'API quota exceeded, please try again later' });
+      return response.status(429).json({ error: 'API quota exceeded, please try again later' });
     }
-    res.status(500).json({ error: 'Internal server error' });
+    response.status(500).json({ error: 'Internal server error' });
     }
 }
 
@@ -48,6 +48,6 @@ export const getChatHistory = async (request,response) => {
         return response.status(200).json(chats)
     } catch (error) {
         console.error('Error fetching history:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    response.status(500).json({ error: 'Internal server error' });
     }
 }
