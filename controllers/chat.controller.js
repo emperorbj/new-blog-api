@@ -5,8 +5,9 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
 export const sendChat = async (request,response) => {
-    const {userId,question} = request.body;
+    
     try {
+        const {userId,question} = request.body;
         if(!userId | !question | typeof question !== 'string') {
             return response.status(400).json({error:"invalid input"})
         }
@@ -17,12 +18,12 @@ export const sendChat = async (request,response) => {
       Question: ${question}`;
     
         const results = await model.generateContent(prompt)
-        const response = await results.response.text();
+        const newresponse = await results.response.text();
 
         const chatResponse = new Chat({
             userId,
             question,
-            response,
+            newresponse,
             timestamp:new Date()
         })
 
