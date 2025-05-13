@@ -7,13 +7,13 @@ import authRouter from './routes/user.route.js'
 import blogRouter from './routes/blog.route.js';
 import videoRouter from './routes/video.route.js'
 import jobs from  './lib/cron.js'
+import chatRouter from './routes/chat.route.js';
 
 
 dotenv.config();
 const port = 3000
 const app = express();
-// const router = require('./routes/user.route');
-// const blogRouter = require('./routes/blog.route');
+
 
 jobs.start()
 
@@ -26,6 +26,7 @@ app.use(express.json());
 app.use('/api/auth',authRouter);
 app.use('/api/blogs',blogRouter);
 app.use('/api/videos',videoRouter)
+app.use('/api/chat',chatRouter);
 
 // CONNECTION WITH MONGODB
 
