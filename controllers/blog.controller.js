@@ -3,22 +3,21 @@ import { Blog } from "../models/blog.model.js";
 
 
 export const addBlog = async (request,response)=>{
-    const {title,summary,content,image,category} = request.body
+    const {title,content,category} = request.body
     try {
-        if(!title || !summary || !content || !image || !category){
+        if(!title || !content || !category){
             return response.status(409).json({message:"All fields are required"})
         }
 
         const blog = new Blog({
             title,
-            summary,
             content,
-            image,
-            category
+            category,
+            user:request.user
         })
 
         await blog.save()
-        return response.status(201).json({success:true ,blog:blog})
+        return response.status(201).json({success:true ,blog})
     } catch (error) {
         return response.status(500).json({message:"something went wrong",error:error.message})
     }
@@ -28,7 +27,7 @@ export const addBlog = async (request,response)=>{
 export const getAllBlogs = async (request,response)=>{
     const {search,title,category, page=1,limit=5} = request.query
     try{
-        const queryObject = {}
+        const queryObject = {user:request.user}
         if(search){
             queryObject.$or = [
                 {title:{ $regex:search , $options:'i' }},
@@ -50,6 +49,7 @@ export const getAllBlogs = async (request,response)=>{
         .skip(skip)
         .limit(parseInt(limit))
         .sort({createdAt: -1})
+        .populate('user','name email')
 
         if(blogs.length === 0 ) {
             return response.status(404).json({message:"No book was found"})
@@ -75,7 +75,8 @@ export const getAllBlogs = async (request,response)=>{
 export const updateBlog = async (request,response)=> {
     const id = request.params.id
     try{
-        const blog = await Blog.findByIdAndUpdate(id,{$set:request.body},{new:true})
+        const blog = await Blog.findByIdAndUpdate({_id:id,user:request.user},{$set:request.body},{new:true})
+        .populate('user','name email')
 
         if(!blog){
             return response.status(404).json({message:"blog not found"})
@@ -93,7 +94,7 @@ export const updateBlog = async (request,response)=> {
 export const deleteBlog = async (request,response)=>{
     const id = request.params.id
     try{
-        const blog = await Blog.findByIdAndDelete(id)
+        const blog = await Blog.findByIdAndDelete({_id:id,user:request.user})
 
         if(!blog){
             return response.status(404).json({message:"blog not found to be deleted"})
@@ -108,7 +109,7 @@ export const deleteBlog = async (request,response)=>{
 export const getSingleBlog = async (request,response)=>{
     const id = request.params.id
     try{
-        const blog = await Blog.findById(id)
+        const blog = await Blog.findById({_id:id,user:request.user}).populate('user','name email')
 
         if(!blog){
             return response.status(404).json({message:"blog not found"})

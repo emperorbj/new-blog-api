@@ -18,10 +18,10 @@ phone:{
 	type:String,
   required:[true,"please enter your password"]
   },
-  profileImage:{
-  type:String,
-  default:"https://api.dicebear.com/7.x/avataaars/svg?seed=hello"
-  }
+  // profileImage:{
+  // type:String,
+  // default:"https://api.dicebear.com/7.x/avataaars/svg?seed=hello"
+  // }
 },{timestamps:true})
 
 export const User = mongoose.model("User",UserSchema)

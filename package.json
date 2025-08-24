@@ -1,8 +1,8 @@
 {
-  "name": "socialapi",
+  "name": "template",
   "version": "1.0.0",
   "type": "module",
-  "description": "Blog application",
+  "description": "A Node.js and MongoDB template project",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "cron": "^4.3.0",
     "dotenv": "^16.5.0",

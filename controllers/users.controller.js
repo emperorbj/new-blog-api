@@ -20,21 +20,21 @@ export const signup = async (request,response)=> {
 
         const hashedPassword = await bcrypt.hash(password,10)
 
-        const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
+        // const profileImage = `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`
 
         const user = new User({
             name,
             email,
             phone,
             password:hashedPassword,
-            profileImage
+            // profileImage
         })
 
         await user.save()
 
-        const token = generateToken(user._id)
+        
 
-        return response.status(201).json({success:true,token,user:{
+        return response.status(201).json({success:true,user:{
             id:user._id,
             name:user.name,
             email:user.email,
@@ -73,9 +73,13 @@ export const login = async (request,response)=> {
 
         const token = generateToken(user._id)
 
-        return response.status(200).json({
+        return response.status(200).cookie("token",token,{
+            httpOnly:true,
+            secure:process.env.NODE_ENV === "production",
+            sameSite:"strict",
+            maxAge:7*24*60*60*1000
+        }).json({
             success:true,
-            token,
             user:{
             id:user._id,
             name:user.name,
