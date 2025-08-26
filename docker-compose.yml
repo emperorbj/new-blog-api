@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  user-service:
+    container_name: user-service
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGO_URI=${MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+      - RABBITMQ_URL=${RABBITMQ_URL}
+    networks:
+      - microservices-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/auth/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+  blog-service:
+    container_name: blog-service
+    build:
+      context: ./blog-service
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URI=${BLOG_SERVICE_MONGO_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - NODE_ENV=production
+      - RABBITMQ_URL=${RABBITMQ_URL}
+    networks:
+      - microservices-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000/api/blogs/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+networks:
+  microservices-network:
+    driver: bridge
